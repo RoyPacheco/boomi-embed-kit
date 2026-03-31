@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Plus, LayoutGrid, List, Plug, AlertTriangle } from 'lucide-react'
-import Sidebar from '../components/Sidebar.jsx'
 import SearchBar from '../components/SearchBar.jsx'
 import IntegrationCard from '../components/IntegrationCard.jsx'
 import AddIntegrationModal from '../components/AddIntegrationModal.jsx'
@@ -224,8 +223,8 @@ function BoomiOverlay({ integration, onClose }) {
   )
 }
 
-// ── Main Dashboard ─────────────────────────────────────────────────
-export default function Dashboard({ pluginReady, sessionError }) {
+// ── Main Dashboard (Integrations page) ────────────────────────────
+export default function Dashboard({ sessionError }) {
   const [search, setSearch] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [boomiOverlayTarget, setBoomiOverlayTarget] = useState(null)
@@ -261,132 +260,118 @@ export default function Dashboard({ pluginReady, sessionError }) {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', flexDirection: 'column' }}>
+    <>
       {/* Session error banner (shown when Boomi plugin could not be initialised) */}
       {sessionError && <SessionBanner message={sessionError} />}
 
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        <Sidebar active="integrations" />
+      {/* Page header */}
+      <div style={{ padding: '32px 32px 0' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#111827', marginBottom: '4px' }}>
+          Integrations
+        </h1>
+        <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '24px' }}>
+          View and manage your active integrations.
+        </p>
 
-        <main
+        {/* Action bar */}
+        <div
           style={{
-            flex: 1,
-            backgroundColor: '#F5F6F8',
-            overflowY: 'auto',
             display: 'flex',
-            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '24px',
+            flexWrap: 'wrap',
           }}
         >
-          {/* Page header */}
-          <div style={{ padding: '32px 32px 0' }}>
-            <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#111827', marginBottom: '4px' }}>
-              Integrations
-            </h1>
-            <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '24px' }}>
-              View and manage your active integrations.
-            </p>
+          <SearchBar value={search} onChange={setSearch} />
 
-            {/* Action bar */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                marginBottom: '24px',
-                flexWrap: 'wrap',
-              }}
-            >
-              <SearchBar value={search} onChange={setSearch} />
+          <button
+            onClick={() => setShowAddModal(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#1565C0',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '9px 16px',
+              fontSize: '13px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              transition: 'background-color 150ms ease',
+              whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1976D2')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1565C0')}
+          >
+            <Plus size={15} />
+            Add Integration
+          </button>
 
+          {/* Grid / List toggle */}
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
+            {[
+              { Icon: LayoutGrid, isGrid: true, title: 'Grid view' },
+              { Icon: List, isGrid: false, title: 'List view' },
+            ].map(({ Icon, isGrid, title }) => (
               <button
-                onClick={() => setShowAddModal(true)}
+                key={String(isGrid)}
+                onClick={() => setGridView(isGrid)}
+                title={title}
                 style={{
+                  padding: '7px',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  backgroundColor: gridView === isGrid ? '#EFF6FF' : '#FFFFFF',
+                  color: gridView === isGrid ? '#1565C0' : '#6B7280',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  backgroundColor: '#1565C0',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '9px 16px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  transition: 'background-color 150ms ease',
-                  whiteSpace: 'nowrap',
+                  transition: 'all 150ms ease',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1976D2')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1565C0')}
               >
-                <Plus size={15} />
-                Add Integration
+                <Icon size={16} />
               </button>
-
-              {/* Grid / List toggle */}
-              <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-                {[
-                  { Icon: LayoutGrid, isGrid: true, title: 'Grid view' },
-                  { Icon: List, isGrid: false, title: 'List view' },
-                ].map(({ Icon, isGrid, title }) => (
-                  <button
-                    key={String(isGrid)}
-                    onClick={() => setGridView(isGrid)}
-                    title={title}
-                    style={{
-                      padding: '7px',
-                      border: '1px solid #D1D5DB',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      backgroundColor: gridView === isGrid ? '#EFF6FF' : '#FFFFFF',
-                      color: gridView === isGrid ? '#1565C0' : '#6B7280',
-                      display: 'flex',
-                      alignItems: 'center',
-                      transition: 'all 150ms ease',
-                    }}
-                  >
-                    <Icon size={16} />
-                  </button>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
+        </div>
+      </div>
 
-          {/* Content area */}
-          <div style={{ padding: '0 32px 32px', flex: 1 }}>
-            {isLoading ? (
-              <div style={gridStyle}>
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))}
-              </div>
-            ) : isError ? (
-              <div style={{ textAlign: 'center', padding: '80px 0' }}>
-                <p style={{ fontSize: '16px', fontWeight: '500', color: '#EF4444' }}>
-                  Failed to load integrations.
-                </p>
-                <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '8px' }}>
-                  Check your server connection and API credentials.
-                </p>
-              </div>
-            ) : filtered.length === 0 ? (
-              <EmptyState search={search} />
-            ) : (
-              <div style={gridStyle}>
-                {filtered.map((integration) => (
-                  <IntegrationCard
-                    key={integration.id}
-                    integration={integration}
-                    // "Edit" opens the full EmbedKit Integrations component in an overlay
-                    onEdit={(i) => setBoomiOverlayTarget(i)}
-                    onDuplicate={handleDuplicate}
-                    onToast={addToast}
-                  />
-                ))}
-              </div>
-            )}
+      {/* Content area */}
+      <div style={{ padding: '0 32px 32px' }}>
+        {isLoading ? (
+          <div style={gridStyle}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
-        </main>
+        ) : isError ? (
+          <div style={{ textAlign: 'center', padding: '80px 0' }}>
+            <p style={{ fontSize: '16px', fontWeight: '500', color: '#EF4444' }}>
+              Failed to load integrations.
+            </p>
+            <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '8px' }}>
+              Check your server connection and API credentials.
+            </p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <EmptyState search={search} />
+        ) : (
+          <div style={gridStyle}>
+            {filtered.map((integration) => (
+              <IntegrationCard
+                key={integration.id}
+                integration={integration}
+                // "Edit" opens the full EmbedKit Integrations component in an overlay
+                onEdit={(i) => setBoomiOverlayTarget(i)}
+                onDuplicate={handleDuplicate}
+                onToast={addToast}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Add Integration modal (custom form with EmbedKit hooks for dropdowns) */}
@@ -407,6 +392,6 @@ export default function Dashboard({ pluginReady, sessionError }) {
       )}
 
       <ToastContainer toasts={toasts} onDismiss={(id) => setToasts((p) => p.filter((t) => t.id !== id))} />
-    </div>
+    </>
   )
 }

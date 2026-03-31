@@ -1,15 +1,18 @@
-import { LayoutDashboard, Zap, ScrollText, Settings, LogOut } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import { LayoutDashboard, Zap, BarChart2, Settings, LogOut } from 'lucide-react'
 import { useAuth } from '../state/authContext.jsx'
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', id: 'dashboard' },
-  { icon: Zap, label: 'Integrations', id: 'integrations' },
-  { icon: ScrollText, label: 'Logs', id: 'logs' },
-  { icon: Settings, label: 'Settings', id: 'settings' },
+  { icon: LayoutDashboard, label: 'Dashboard',    path: '/' },
+  { icon: Zap,             label: 'Integrations', path: '/integrations' },
+  { icon: BarChart2,       label: 'Reports',      path: '/reports' },
+  { icon: Settings,        label: 'Settings',     path: '/settings' },
 ]
 
-export default function Sidebar({ active = 'integrations' }) {
+export default function Sidebar() {
   const { session, logout } = useAuth()
+  const { pathname } = useLocation()
+
   return (
     <aside
       style={{
@@ -19,7 +22,6 @@ export default function Sidebar({ active = 'integrations' }) {
         borderRight: '1px solid #E5E7EB',
         display: 'flex',
         flexDirection: 'column',
-        padding: '0',
         height: '100vh',
         position: 'sticky',
         top: 0,
@@ -56,11 +58,12 @@ export default function Sidebar({ active = 'integrations' }) {
 
       {/* Navigation */}
       <nav style={{ padding: '12px', flex: 1 }}>
-        {navItems.map(({ icon: Icon, label, id }) => {
-          const isActive = active === id
+        {navItems.map(({ icon: Icon, label, path }) => {
+          const isActive = path === '/' ? pathname === '/' : pathname.startsWith(path)
           return (
-            <div
-              key={id}
+            <Link
+              key={path}
+              to={path}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -74,13 +77,14 @@ export default function Sidebar({ active = 'integrations' }) {
                 borderLeft: isActive ? '3px solid #1565C0' : '3px solid transparent',
                 fontWeight: isActive ? '500' : '400',
                 fontSize: '14px',
+                textDecoration: 'none',
                 transition: 'all 150ms ease',
                 userSelect: 'none',
               }}
             >
               <Icon size={17} />
               <span>{label}</span>
-            </div>
+            </Link>
           )
         })}
       </nav>
