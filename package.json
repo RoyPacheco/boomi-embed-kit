@@ -1,0 +1,11 @@
+{
+  "name": "boomi-embed-kit",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix CSO-boomi-app\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
